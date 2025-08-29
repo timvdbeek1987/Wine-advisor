@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8"/>
+  <title>Wijnadvies — Jouw Wijnrecept</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="/static/styles.css"/>
+</head>
+<body>
+  <header>
+    <h1>Ontdek jouw perfecte wijn in 3 minuten</h1>
+    <p>Geen jargon—gewoon kiezen wat bij je past. 🍷</p>
+  </header>
+
+  <main>
+    <section id="quiz">
+      <div id="step"></div>
+      <div id="options"></div>
+      <div class="progress"><span id="progress"></span></div>
+      <div class="actions">
+        <button id="prev" disabled>Terug</button>
+        <button id="next" disabled>Volgende</button>
+      </div>
+    </section>
+
+    <section id="result" class="hidden">
+      <h2>Jouw Wijnrecept</h2>
+      <div id="profile"></div>
+      <div id="matches"></div>
+      <button id="restart">Opnieuw doen</button>
+    </section>
+  </main>
+
+  <script src="/static/quiz.js"></script>
+</body>
+</html>

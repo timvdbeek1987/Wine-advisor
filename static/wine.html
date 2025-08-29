@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8"/>
+  <title>Wijn detail | Wine Advisor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet" href="/static/styles.css"/>
+  <style>
+    .wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+    .card { border:1px solid #e5e7eb; border-radius:10px; padding:16px; background:#fff; margin: 12px 0; }
+    .stack { display:flex; flex-direction:column; gap:12px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field input, .field select, .field textarea { padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .row-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+    .row-4 { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border:1px solid #ccc; background:#fff; border-radius:8px; cursor:pointer; }
+    .btn.primary { background:#121B39; color:#fff; border-color:#121B39; }
+    .btn.secondary { background:#4BAA9E; color:#fff; border-color:#4BAA9E; }
+    .muted { color:#666; font-size:12px; }
+    .sliders { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .sliders label { font-size:12px; color:#555; display:flex; justify-content:space-between; }
+    .grapes { display:flex; flex-direction:column; gap:8px; }
+    .grape-row { display:grid; grid-template-columns: 3fr 1fr auto; gap:8px; align-items:center; }
+    @media (max-width: 720px) {
+      .row, .row-3, .row-4, .sliders, .grape-row { grid-template-columns: 1fr; }
+    }
+    .crumbs a { color:#121B39; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="crumbs"><a href="/admin">← Terug naar beheer</a></div>
+    <h1>Wijn detail <span id="titleName" class="muted"></span></h1>
+  </header>
+
+  <main class="wrap">
+    <!-- Basis -->
+    <section class="card stack">
+      <h2>1) Basis</h2>
+      <div class="row-3">
+        <div class="field"><label>Naam</label><input id="name"/></div>
+        <div class="field"><label>Huis/producent</label><input id="producer"/></div>
+        <div class="field"><label>Regio</label><input id="region"/></div>
+      </div>
+      <div class="row-4">
+        <div class="field"><label>Jaargang</label><input id="vintage" type="number"/></div>
+        <div class="field"><label>Klimaat</label>
+          <select id="climate"><option>cool</option><option selected>temperate</option><option>warm</option></select>
+        </div>
+        <div class="field"><label>Bodem</label><input id="soil" placeholder="limestone, granite, ..."/></div>
+        <div class="field"><label>Élevage</label><input id="elevage" placeholder="oak, stainless, amphora"/></div>
+      </div>
+      <div class="row-4">
+        <div class="field"><label>ABV (%)</label><input id="abv" type="number" step="0.1"/></div>
+        <div class="field"><label>Prijs (€)</label><input id="price_eur" type="number" step="0.01"/></div>
+        <div class="field"><label>Inkoopprijs (€)</label><input id="purchase_price_eur" type="number" step="0.01"/></div>
+        <div class="field"><label>Flesgrootte (ml)</label><input id="bottle_size_ml" type="number" step="1" value="750"/></div>
+      </div>
+    </section>
+
+    <!-- Voorraad & venster -->
+    <section class="card stack">
+      <h2>2) Voorraad & drinkvenster</h2>
+      <div class="row-3">
+        <div class="field"><label>Aantal flessen</label><input id="bottles" type="number" min="0" step="1"/></div>
+        <div class="field"><label>Opslaglocatie</label><input id="storage_location" placeholder="Kelderrek A3"/></div>
+        <div class="field"><label>Drinkvenster (vanaf–t/m)</label>
+          <div class="row"><input id="drinking_from" type="number" placeholder="2024"/><input id="drinking_to" type="number" placeholder="2030"/></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Druiven -->
+    <section class="card stack">
+      <h2>3) Druiven</h2>
+      <div class="muted">Gewicht = aandeel (0–1). <button id="normalize" class="btn">Normaliseer</button></div>
+      <div class="grapes" id="grapes"></div>
+      <button class="btn ghost" id="addGrape">Ras toevoegen</button>
+    </section>
+
+    <!-- Profiel -->
+    <section class="card stack">
+      <h2>4) Smaakprofiel</h2>
+      <div class="actions">
+        <button class="btn primary" id="btnRule">Auto-profiel (regels)</button>
+        <button class="btn secondary" id="btnEnrich">Verrijk online (beta)</button>
+      </div>
+      <div id="msg" class="muted"></div>
+      <div class="sliders">
+        <div class="field"><label>ZB <span id="vZB"></span></label><input type="range" id="ZB" min="0" max="100" value="50"></div>
+        <div class="field"><label>MG <span id="vMG"></span></label><input type="range" id="MG" min="0" max="100" value="50"></div>
+        <div class="field"><label>LS <span id="vLS"></span></label><input type="range" id="LS" min="0" max="100" value="50"></div>
+        <div class="field"><label>PA <span id="vPA"></span></label><input type="range" id="PA" min="0" max="100" value="50"></div>
+        <div class="field"><label>GF <span id="vGF"></span></label><input type="range" id="GF" min="0" max="100" value="50"></div>
+      </div>
+    </section>
+
+    <!-- Food pairing & notities -->
+    <section class="card stack">
+      <h2>5) Food pairing & notities</h2>
+      <div class="field"><label>Food pairing (vrij)</label><textarea id="food_pairings" placeholder="Vis, schaal/schelpdieren, gevogelte, rood vlees, kazen…"></textarea></div>
+      <div class="field"><label>Notities</label><textarea id="notes"></textarea></div>
+      <div class="sources" id="sources"></div>
+    </section>
+
+    <section class="card stack">
+      <div class="actions">
+        <button class="btn primary" id="btnSave">Wijzigingen opslaan</button>
+        <span id="saveMsg" class="muted"></span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.__WINE_ID__ = "{{WINE_ID}}";
+  </script>
+  <script src="/static/wine.js"></script>
+</body>
+</html>
